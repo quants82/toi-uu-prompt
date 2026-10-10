@@ -1,0 +1,37 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:16.000
+Mở website Prompt Giáo Viên.
+Tìm mục "Kết nối AI của thầy cô".
+
+00:00:16.000 --> 00:00:34.000
+Chọn OpenAI và nhấn "Lấy khóa API".
+Đăng nhập tài khoản OpenAI.
+
+00:00:34.000 --> 00:00:58.000
+Tại trang API keys, tạo khóa mới.
+Đặt tên và chọn cấu hình phù hợp với tài khoản.
+
+00:00:58.000 --> 00:01:01.000
+Sao chép khóa vừa tạo.
+Khóa trong video đã được che.
+
+00:01:01.000 --> 00:01:22.000
+Trở về website và dán khóa OpenAI.
+Có thể nhớ khóa trên máy cá nhân và chọn mô hình.
+
+00:01:22.000 --> 00:01:39.000
+Chuyển sang Google Gemini.
+Nhấn "Lấy khóa API" để mở Google AI Studio.
+
+00:01:39.000 --> 00:02:13.000
+Tạo hoặc chọn project trong Google AI Studio.
+Đặt tên và tạo khóa Gemini.
+
+00:02:13.000 --> 00:02:19.000
+Sao chép khóa Gemini vừa tạo.
+Khóa trong video đã được che.
+
+00:02:19.000 --> 00:02:27.900
+Trở về website, chọn Google Gemini và dán khóa.
+Chọn mô hình trước khi tối ưu prompt.

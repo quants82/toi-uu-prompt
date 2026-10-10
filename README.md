@@ -85,3 +85,7 @@ Nguyên văn yêu cầu cần đạt là đầu vào bắt buộc; thiếu thì 
 Node.js 24.x. Đọc Word bằng fflate/fast-xml-parser và PDF bằng pdf-parse; các package PDF được externalize cho máy chủ Next/Vercel. Không lưu Google token trên thiết bị hoặc máy chủ. Chỉ đọc các tệp được chọn, không tự quét cả thư mục Drive.
 
 Kiểm tra: `npm test`, `npm run typecheck`, `npm run build`. `npm run test:browser` tự build riêng với ba định danh Google giả cho kiểm thử OAuth/Picker bằng mock rồi chạy Chrome cục bộ; không gọi OAuth bằng tài khoản thật, không triển khai bản build giả. Vercel build lại từ Git với biến Production của chủ website.
+
+## Video hướng dẫn lấy khóa API
+
+Trang `/huong-dan` và hộp Hướng dẫn có video OpenAI/Gemini, nút chuyển nhanh đến từng phần, chỉ dẫn thao tác tiếng Việt và liên kết tải video. Liên kết cũng có cạnh ô khóa API và trang `/drive-setup`. Video được phục vụ tĩnh từ `public/videos/lay-api-key.mp4` (H.264/AAC, faststart); bản công khai che phần hiển thị khóa và tài khoản trong đoạn minh họa, không thay đổi video nguồn của chủ website.
