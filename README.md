@@ -9,7 +9,9 @@ Website tiếng Việt giúp giáo viên mọi cấp học tối ưu prompt, s�
 - AI hỏi bổ sung khi thiếu thông tin thiết yếu; chỉ khi đủ mới tạo prompt hoàn chỉnh.
 - Tùy chọn công thức toán: LaTeX trong một cặp dấu `$...$`.
 - Ghi mô tả tài liệu, cấu trúc form mẫu và chọn tên tệp PDF/Word/ảnh. **Không đọc hay tải nội dung tệp lên máy chủ.** Giáo viên đính kèm lại tài liệu khi sử dụng prompt tại công cụ AI khác.
-- Sao chép, tải TXT/Markdown, tự lưu tối đa 20 prompt hoàn chỉnh trên trình duyệt.
+- Vai trò mặc định “giáo viên giỏi bộ môn” tự cập nhật theo môn/cấp học, có thể viết vai trò riêng.
+- Chọn mô hình riêng theo OpenAI/Gemini; tải danh sách từ API hoặc nhập mã mô hình khác hỗ trợ văn bản và JSON có cấu trúc.
+- Sao chép, tải Word (.docx)/TXT/Markdown, tự lưu tối đa 20 prompt hoàn chỉnh trên trình duyệt.
 - Giao diện nền sáng xanh dương, dùng được trên điện thoại, có hướng dẫn và lịch sử.
 
 Website chỉ tạo prompt; không trực tiếp tạo giáo án hoặc tài liệu dạy học.
@@ -43,13 +45,13 @@ npm start
 7. Deploy. Khi có trạng thái Ready, mở địa chỉ Vercel cấp.
 8. Các commit vào nhánh production (`main`) kích hoạt triển khai lại.
 
-Ứng dụng có route máy chủ `POST /api/optimize`; cần triển khai dưới dạng Next.js, không dùng static export.
+Ứng dụng có route máy chủ `POST /api/optimize` và `POST /api/models`; cần triển khai dưới dạng Next.js, không dùng static export.
 
 ## Dữ liệu và khóa API
 
-- Khóa API chỉ nằm trong React state của tab đang mở; tải lại trang sẽ cần nhập lại.
-- Khóa được gửi qua header tới route cùng nguồn, rồi chuyển tới nhà cung cấp qua HTTPS. Mã ứng dụng không ghi khóa hay nội dung yêu cầu vào log, database hoặc localStorage.
-- Lịch sử trên localStorage chỉ có thông tin yêu cầu và prompt đầu ra; không chứa khóa API. Người dùng có thể xóa từng mục hoặc toàn bộ.
+- Mặc định khóa API chỉ nằm trong React state của tab đang mở; tải lại trang sẽ cần nhập lại. Tùy chọn “Nhớ khóa API” mặc định tắt và riêng cho mỗi nhà cung cấp. Nếu bật, khóa lưu dạng văn bản trong localStorage của trình duyệt hiện tại, phù hợp máy cá nhân. Bỏ chọn xóa bản lưu; nút × xóa cả khóa đã lưu và khóa trong phiên.
+- Khóa được gửi qua header tới route cùng nguồn, rồi chuyển tới nhà cung cấp qua HTTPS. Mã ứng dụng không ghi khóa hay nội dung yêu cầu vào log hoặc database; localStorage chỉ lưu khóa khi người dùng chủ động bật nhớ.
+- Lịch sử trên localStorage chỉ có thông tin yêu cầu và prompt đầu ra; không chứa khóa API. File Word/TXT/Markdown cũng không chứa khóa. Người dùng có thể xóa từng mục hoặc toàn bộ.
 - Nội dung prompt, thông tin bổ sung, tên/mô tả tài liệu được gửi đến nhà cung cấp AI đã chọn. Không gửi nội dung tệp.
 - OpenAI Responses đặt `store: false`; điều này không thay thế chính sách xử lý dữ liệu của nhà cung cấp.
 - Chi phí và quyền sử dụng mô hình phụ thuộc tài khoản API của giáo viên.
@@ -59,6 +61,9 @@ npm start
 
 Các mô hình mặc định có thể điều chỉnh tại `lib/config.ts`. Kiểm tra tên mô hình và quyền truy cập khi nhà cung cấp thay đổi.
 
+- [OpenAI Models API](https://developers.openai.com/api/reference/resources/models/methods/list)
+- [Gemini Models API](https://ai.google.dev/api/models)
+- [docx Packer](https://docx.js.org/api/classes/index.Packer.html)
 - [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses)
 - [OpenAI GPT-4.1 mini](https://developers.openai.com/api/docs/models/gpt-4.1-mini)
 - [Gemini Models](https://ai.google.dev/gemini-api/docs/models)

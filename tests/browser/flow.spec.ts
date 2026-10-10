@@ -52,6 +52,11 @@ test("desktop: clarification, result, copy, downloads, history and transient key
   const md = page.waitForEvent("download");
   await page.getByRole("button", { name: "MD", exact: true }).click();
   expect((await md).suggestedFilename()).toBe("prompt-exercises.md");
+  const word = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Word", exact: true }).click();
+  const wordDownload = await word;
+  expect(wordDownload.suggestedFilename()).toBe("prompt-exercises.docx");
+  await wordDownload.saveAs("test-results/word-from-browser.docx");
   const saved = await page.evaluate(key => localStorage.getItem(key), HISTORY_KEY);
   expect(saved).toContain("phương trình");
   expect(saved).not.toContain("TEST-ONLY-KEY");

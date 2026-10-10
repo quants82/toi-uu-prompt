@@ -10,11 +10,11 @@ export type TaskId = typeof tasks[number]["id"];
 export type Provider = "openai" | "gemini";
 export type TaskField = { key: string; label: string; placeholder?: string; options?: readonly string[] };
 export const providers = {
-  openai: { label: "OpenAI", defaultModel: "gpt-4.1-mini", models: ["gpt-4.1-mini", "gpt-4.1"], keyUrl: "https://platform.openai.com/api-keys" },
-  gemini: { label: "Google Gemini", defaultModel: "gemini-3.8-flash", models: ["gemini-3.8-flash", "gemini-3.5-flash-lite"], keyUrl: "https://aistudio.google.com/apikey" }
+  openai: { label: "OpenAI", defaultModel: "gpt-4.1-mini", models: ["gpt-4.1-mini", "gpt-4.1", "gpt-4o-mini", "gpt-4o", "gpt-5-mini", "gpt-5", "gpt-6-luna", "gpt-6.1-sol", "gpt-6-astra"], keyUrl: "https://platform.openai.com/api-keys" },
+  gemini: { label: "Google Gemini", defaultModel: "gemini-3.8-flash", models: ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.1-flash-lite", "gemini-3.1-pro-preview", "gemini-2.5-flash", "gemini-2.5-pro"], keyUrl: "https://aistudio.google.com/apikey" }
 } as const;
 export const fieldLabels: Record<string, string> = {
-  level: "Cấp học", grade: "Lớp / nhóm tuổi", subject: "Môn học", topic: "Bài / chủ đề",
+  roleMode: "Cách chọn vai trò AI", role: "Vai trò AI tùy chỉnh", level: "Cấp học", grade: "Lớp / nhóm tuổi", subject: "Môn học", topic: "Bài / chủ đề",
   duration: "Thời lượng", audience: "Đối tượng học sinh", objectives: "Mục tiêu",
   curriculum: "Chương trình / bộ sách", equipment: "Điều kiện dạy học",
   methods: "Phương pháp", extra: "Yêu cầu khác", sequence: "Tiến trình",

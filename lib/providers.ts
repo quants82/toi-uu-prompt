@@ -4,7 +4,7 @@ import type { OptimizerResult } from "./config";
 export class ProviderError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
-function friendlyError(status: number, code?: string): ProviderError {
+export function friendlyError(status: number, code?: string): ProviderError {
   if (status === 401 || status === 403) return new ProviderError(status, "Khóa API chưa đúng, chưa được cấp quyền hoặc không được phép dùng mô hình này. Hãy kiểm tra khóa và mô hình.");
   if (status === 429) return new ProviderError(429, code === "insufficient_quota" ? "Tài khoản API đã hết hạn mức hoặc chưa có số dư. Hãy kiểm tra thanh toán của nhà cung cấp." : "Đã chạm giới hạn sử dụng API. Vui lòng chờ một chút rồi thử lại hoặc kiểm tra hạn mức.");
   if (status === 404) return new ProviderError(400, "Không tìm thấy mô hình hoặc tài khoản của bạn chưa có quyền sử dụng. Hãy chọn mô hình khác.");
