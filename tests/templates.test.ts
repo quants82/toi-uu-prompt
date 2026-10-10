@@ -50,7 +50,9 @@ test("missing requirements are clarified before contacting AI and the clarified 
   const input={provider:"openai" as const,model:"gpt-4.1-mini",draft:missing,answers:[]};
   assert.equal((await optimizeWithProvider(input,"TEST-KEY",fetcher)).questions[0].id,"learningRequirements");assert.equal(calls,0);
   assert.equal((await optimizeWithProvider({...input,answers:[{id:"learningRequirements",question:"Chuẩn?",answer:"không yêu cầu"}]},"TEST-KEY",fetcher)).status,"questions");assert.equal(calls,0);
-  const result=await optimizeWithProvider({...input,answers:[{id:"learningRequirements",question:"Chuẩn?",answer:draft.fields.learningRequirements}]},"TEST-KEY",fetcher);
+  const clarified=requestSchema.parse({...input,answers:[{id:"learningRequirements",question:"Chuẩn?",answer:draft.fields.learningRequirements}]});
+  assert.equal(clarified.answers[0].answer,draft.fields.learningRequirements);
+  const result=await optimizeWithProvider(clarified,"TEST-KEY",fetcher);
   assert.equal(calls,1);assert.ok(result.optimizedPrompt.includes(draft.fields.learningRequirements));
 });
 test("DOCX text extraction retains Vietnamese headings, paragraphs, table cells and their order",async()=>{

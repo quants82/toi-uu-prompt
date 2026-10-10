@@ -125,7 +125,7 @@ export default function Optimizer() {
     if (continueQuestions && result?.status === "questions") {
       const missing = result.questions.find(q => !currentAnswers[q.id]?.trim());
       if (missing) { setError("Vui lòng trả lời đầy đủ các câu hỏi bổ sung. Có thể ghi “không yêu cầu” nếu không áp dụng."); document.getElementById("answer-" + missing.id)?.focus(); return; }
-      const additions = result.questions.map(q => ({ id: q.id, question: q.question, answer: currentAnswers[q.id].trim() }));
+      const additions = result.questions.map(q => ({ id: q.id, question: q.question, answer: q.id === "learningRequirements" ? currentAnswers[q.id] : currentAnswers[q.id].trim() }));
       const map = new Map([...answers, ...additions].map(a => [a.id, a]));
       nextAnswers = Array.from(map.values());
     }

@@ -18,7 +18,7 @@ export const requestSchema = z.object({
     formTemplate: formTemplateSchema.optional()
   }),
   answers: z.array(z.object({
-    id: z.string().max(100), question: z.string().max(1000), answer: z.string().trim().min(1).max(6000)
+    id: z.string().max(100), question: z.string().max(1000), answer: z.string().min(1).max(6000).refine(value => Boolean(value.trim()))
   })).max(40)
 });
 export type OptimizerRequest = z.infer<typeof requestSchema>;

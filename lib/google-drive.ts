@@ -16,15 +16,16 @@ type PickerEvent={action:string;docs?:DriveFile[]};
 type PickerView={setMimeTypes(v:string):PickerView;setIncludeFolders(v:boolean):PickerView;setSelectFolderEnabled(v:boolean):PickerView};
 type Picker={setVisible(v:boolean):void};
 type PickerBuilder={enableFeature(v:string):PickerBuilder;setDeveloperKey(v:string):PickerBuilder;setAppId(v:string):PickerBuilder;setOAuthToken(v:string):PickerBuilder;setOrigin(v:string):PickerBuilder;addView(v:PickerView):PickerBuilder;setCallback(v:(event:PickerEvent)=>void):PickerBuilder;build():Picker};
-type GoogleSdk={accounts:{oauth2:{initTokenClient(options:{client_id:string;scope:string;include_granted_scopes:boolean;callback:(r:TokenResponse)=>void;error_callback:()=>void}):{requestAccessToken(options:{prompt:string}):void};revoke(token:string,callback:()=>void):void}};picker:{DocsView:new (id:string)=>PickerView;ViewId:{DOCS:string};PickerBuilder:new()=>PickerBuilder;Feature:{MULTISELECT_ENABLED:string};Action:{PICKED:string;CANCEL:string}}};
+type GoogleSdk={accounts:{oauth2:{initTokenClient(options:{client_id:string;scope:string;include_granted_scopes:boolean;callback:(r:TokenResponse)=>void;error_callback:()=>void}):{requestAccessToken(options:{prompt:string}):void};revoke(token:string,callback:(response:{successful:boolean;error?:string})=>void):void}};picker:{DocsView:new (id:string)=>PickerView;ViewId:{DOCS:string};PickerBuilder:new()=>PickerBuilder;Feature:{MULTISELECT_ENABLED:string};Action:{PICKED:string;CANCEL:string}}};
 type GoogleWindow=Window&{google?:GoogleSdk;gapi?:{load(name:string,options:{callback:()=>void;onerror:()=>void;timeout:number;ontimeout:()=>void}):void}};
 function sdkWindow(){return window as GoogleWindow;}
 function script(id:string,url:string):Promise<void>{return new Promise((resolve,reject)=>{
   const old=document.getElementById(id) as HTMLScriptElement|null;
   if(old?.dataset.loaded){resolve();return;}
   const element=old||document.createElement("script");
-  element.addEventListener("load",()=>{element.dataset.loaded="true";resolve();},{once:true});
-  element.addEventListener("error",()=>{element.remove();reject(new Error("Chưa tải được kết nối Google. Hãy kiểm tra mạng hoặc trình chặn nội dung."));},{once:true});
+  const timer=window.setTimeout(()=>{element.remove();reject(new Error("Kết nối Google quá lâu. Hãy kiểm tra mạng và thử lại."));},15000);
+  element.addEventListener("load",()=>{window.clearTimeout(timer);element.dataset.loaded="true";resolve();},{once:true});
+  element.addEventListener("error",()=>{window.clearTimeout(timer);element.remove();reject(new Error("Chưa tải được kết nối Google. Hãy kiểm tra mạng hoặc trình chặn nội dung."));},{once:true});
   if(!old){element.id=id;element.src=url;element.async=true;document.head.appendChild(element);}
 });}
 let preparation:Promise<void>|null=null;
@@ -59,7 +60,8 @@ export function pickDriveForms(token:DriveToken,config:DriveConfig):Promise<Driv
     }).build();picker.setVisible(true);
   }catch{reject(new Error("Chưa mở được bộ chọn Drive. Hãy kiểm tra cấu hình kết nối Google của website."));}
 });}
-export function revokeDrive(token:DriveToken):Promise<void>{return new Promise(resolve=>{
-  const google=sdkWindow().google;if(!google?.accounts?.oauth2){resolve();return;}
-  google.accounts.oauth2.revoke(token.accessToken,resolve);
+export function revokeDrive(token:DriveToken):Promise<void>{return new Promise((resolve,reject)=>{
+  const google=sdkWindow().google;if(!google?.accounts?.oauth2){reject(new Error("Google chưa sẵn sàng để thu hồi quyền."));return;}
+  const timer=window.setTimeout(()=>reject(new Error("Chưa xác nhận được việc thu hồi quyền Drive.")),10000);
+  google.accounts.oauth2.revoke(token.accessToken,response=>{window.clearTimeout(timer);if(response.successful)resolve();else reject(new Error("Google chưa xác nhận thu hồi quyền. Hãy kiểm tra kết nối tài khoản Google."));});
 });}
