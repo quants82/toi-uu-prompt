@@ -1,0 +1,85 @@
+import { test, expect } from "@playwright/test";
+import { HISTORY_KEY } from "../../lib/storage";
+test("desktop: clarification, result, copy, downloads, history and transient keys", async ({ page, context }) => {
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  const errors: string[] = [];
+  page.on("pageerror", e => errors.push(e.message));
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Thầy cô muốn làm gì?" })).toBeVisible();
+  await page.screenshot({ path: "test-results/desktop.png", fullPage: true });
+  await page.getByRole("button", { name: "Tối ưu prompt với AI" }).click();
+  await expect(page.locator(".error-message")).toContainText("yêu cầu ban đầu");
+  await page.getByLabel("Loại công việc").selectOption("exercises");
+  await page.getByRole("button", { name: "Dùng ví dụ" }).click();
+  await page.getByLabel("Cấp học", { exact: true }).selectOption("THCS");
+  await page.getByLabel("Lớp / nhóm tuổi").fill("Lớp 9");
+  await page.getByLabel("Môn học / lĩnh vực").fill("Toán");
+  await page.getByLabel("Có công thức toán").check();
+  await page.getByText("Tài liệu & form mẫu", { exact: false }).first().click();
+  await page.locator("#attachments").setInputFiles({ name: "SGK.pdf", mimeType: "application/pdf", buffer: Buffer.from("FILE-BYTES-MUST-STAY-LOCAL") });
+  await page.getByLabel("Khóa API", { exact: true }).fill("TEST-ONLY-KEY-NOT-REAL");
+  let count = 0;
+  await page.route("**/api/optimize", async route => {
+    const request = route.request();
+    const body = request.postDataJSON();
+    expect(request.headers()["x-provider-key"]).toBe("TEST-ONLY-KEY-NOT-REAL");
+    expect(body.provider).toBe("openai");
+    expect(body.draft.fileNames).toEqual(["SGK.pdf"]);
+    expect(request.postData()).not.toContain("FILE-BYTES-MUST-STAY-LOCAL");
+    count++;
+    if (count === 1) {
+      await route.fulfill({ json: { status: "questions", summary: "Cần làm rõ phân bố bài tập.", questions: [{ id: "distribution", question: "Thầy cô cần bao nhiêu câu ở từng mức?", hint: "Ví dụ 3–3–3–1" }], optimizedPrompt: "", improvements: [] } });
+    } else {
+      expect(body.answers[0].answer).toBe("10 câu, phân bố 3–3–3–1");
+      await route.fulfill({ json: { status: "ready", summary: "Prompt có cấu trúc và yêu cầu rõ ràng.", questions: [], optimizedPrompt: "Hãy tạo 10 bài tập phương trình bậc hai lớp 9, phân bố 3–3–3–1. Viết công thức trong $...$, ví dụ $x^2$. Đính kèm SGK.pdf trước khi làm.", improvements: ["Làm rõ phân bố mức độ", "Yêu cầu bám tài liệu", "Giữ định dạng LaTeX"] } });
+    }
+  });
+  await page.getByRole("button", { name: "Tối ưu prompt với AI" }).click();
+  await expect(page.getByRole("heading", { name: "AI cần thầy cô làm rõ" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Sao chép", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Gửi bổ sung & tối ưu prompt" }).click();
+  await expect(page.locator(".error-message")).toContainText("trả lời đầy đủ");
+  await page.locator("#answer-distribution").fill("10 câu, phân bố 3–3–3–1");
+  await page.getByRole("button", { name: "Gửi bổ sung & tối ưu prompt" }).click();
+  await expect(page.locator(".prompt-output")).toContainText("$x^2$");
+  await page.getByRole("button", { name: "Sao chép", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Đã sao chép" })).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toContain("$x^2$");
+  const txt = page.waitForEvent("download");
+  await page.getByRole("button", { name: "TXT", exact: true }).click();
+  expect((await txt).suggestedFilename()).toBe("prompt-exercises.txt");
+  const md = page.waitForEvent("download");
+  await page.getByRole("button", { name: "MD", exact: true }).click();
+  expect((await md).suggestedFilename()).toBe("prompt-exercises.md");
+  const saved = await page.evaluate(key => localStorage.getItem(key), HISTORY_KEY);
+  expect(saved).toContain("phương trình");
+  expect(saved).not.toContain("TEST-ONLY-KEY");
+  await page.screenshot({ path: "test-results/result.png", fullPage: true });
+  await page.reload();
+  await expect(page.locator("#api-key")).toHaveValue("");
+  await page.getByRole("button", { name: "Lịch sử", exact: false }).click();
+  await expect(page.getByRole("dialog")).toContainText("Bài tập theo mức độ");
+  await page.locator(".history-item > button").first().click();
+  await expect(page.locator(".prompt-output")).toContainText("$x^2$");
+  expect(errors).toEqual([]);
+});
+test("mobile: all task forms, Gemini choice, help dialog and no horizontal overflow", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.screenshot({ path: "test-results/mobile.png", fullPage: true });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  for (const value of ["lesson", "worksheet", "exercises", "assessment", "rubric", "activities"]) {
+    await page.locator("#task").selectOption(value);
+    await expect(page.locator("#task")).toHaveValue(value);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  }
+  await page.getByRole("button", { name: "Google Gemini", exact: true }).click();
+  await expect(page.locator("#model")).toHaveValue("gemini-3.8-flash");
+  await expect(page.locator("#api-key")).toHaveAttribute("placeholder", "Nhập khóa API Gemini…");
+  await page.getByRole("button", { name: "Hướng dẫn", exact: true }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByRole("dialog")).toContainText("Khóa API chỉ giữ trong bộ nhớ");
+  await page.getByRole("button", { name: "Đóng", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+});
