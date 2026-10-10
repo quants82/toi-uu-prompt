@@ -76,3 +76,12 @@ Bộ kiểm thử dùng phản hồi AI mô phỏng để xác minh cấu trúc 
 
 
 Kiểm thử giao diện: chạy `npm run build` rồi `npm run test:browser`. Trên Windows, bộ kiểm thử dùng Chrome hiện có; trên máy khác, chạy `npx playwright install chromium` trước. Các kiểm thử này dùng API mô phỏng, không gửi khóa hay yêu cầu tới nhà cung cấp thật.
+## Thư viện form Google Drive, prompt chi tiết và chuẩn cần đạt
+
+Ứng dụng đã có thư viện form lưu trên trình duyệt, tự chọn mẫu theo công việc/môn/cấp, tùy chọn ghi nhớ mẫu thủ công và cập nhật từ Drive. Kết nối OAuth cần chủ website cấu hình ba biến public dành riêng cho Google Picker rồi build lại; xem [hướng dẫn](docs/google-drive-setup.md) hoặc trang /drive-setup. Khi chưa cấu hình, giao diện báo rõ Drive chưa kích hoạt; có thể lưu form văn bản.
+
+Nguyên văn yêu cầu cần đạt là đầu vào bắt buộc; thiếu thì hỏi bổ sung trước khi gọi AI. Prompt chi tiết gồm nhiệm vụ, đầu vào, chuẩn cần đạt, quy trình, cấu trúc đầu ra và tự kiểm tra. Chuẩn gốc được chèn nguyên văn và cấm sửa; mục tiêu thiết kế riêng không thay thế chuẩn. Có hiệu ứng AI nền tối trong lúc chờ, thời gian chờ thực tế, nút dừng và hỗ trợ giảm chuyển động.
+
+Node.js 24.x. Đọc Word bằng fflate/fast-xml-parser và PDF bằng pdf-parse; các package PDF được externalize cho máy chủ Next/Vercel. Không lưu Google token trên thiết bị hoặc máy chủ. Chỉ đọc các tệp được chọn, không tự quét cả thư mục Drive.
+
+Kiểm tra: `npm test`, `npm run typecheck`, `npm run build`. `npm run test:browser` tự build riêng với ba định danh Google giả cho kiểm thử OAuth/Picker bằng mock rồi chạy Chrome cục bộ; không gọi OAuth bằng tài khoản thật, không triển khai bản build giả. Vercel build lại từ Git với biến Production của chủ website.

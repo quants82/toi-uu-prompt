@@ -1,4 +1,5 @@
 import { buildInput, parseResult, responseSchema, systemInstruction, type OptimizerRequest } from "./optimizer";
+import { learningRequirementsText, requirementsQuestion } from "./learning-requirements";
 import type { OptimizerResult } from "./config";
 
 export class ProviderError extends Error {
@@ -13,6 +14,9 @@ export function friendlyError(status: number, code?: string): ProviderError {
 }
 
 export async function optimizeWithProvider(input: OptimizerRequest, apiKey: string, fetcher: typeof fetch = fetch): Promise<OptimizerResult> {
+  const requirements=learningRequirementsText(input.draft,input.answers);
+  if(!requirements) return requirementsQuestion();
+  input={...input,draft:{...input.draft,fields:{...input.draft.fields,learningRequirements:requirements}}};
   const content = buildInput(input);
   let url: string;
   let body: unknown;

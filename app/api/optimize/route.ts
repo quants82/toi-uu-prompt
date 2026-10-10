@@ -1,3 +1,4 @@
+import { isSameOrigin } from "@/lib/request-origin";
 import { NextRequest, NextResponse } from "next/server";
 import { requestSchema } from "@/lib/optimizer";
 import { optimizeWithProvider, ProviderError } from "@/lib/providers";
@@ -8,13 +9,12 @@ function reply(body: unknown, status = 200) {
   return NextResponse.json(body, { status, headers: { "Cache-Control": "no-store" } });
 }
 export async function POST(request: NextRequest) {
-  const origin = request.headers.get("origin");
-  if (origin && origin !== request.nextUrl.origin) return reply({ error: "Yêu cầu không cùng nguồn với website." }, 403);
+  if (!isSameOrigin(request)) return reply({ error: "Yêu cầu không cùng nguồn với website." }, 403);
   const apiKey = request.headers.get("x-provider-key")?.trim();
   if (!apiKey || apiKey.length < 10 || apiKey.length > 512 || /[\r\n]/.test(apiKey)) return reply({ error: "Vui lòng nhập khóa API hợp lệ của nhà cung cấp đã chọn." }, 400);
   try {
     const raw = await request.text();
-    if (new TextEncoder().encode(raw).length > 150000) return reply({ error: "Nội dung quá dài. Vui lòng rút gọn yêu cầu." }, 413);
+    if (new TextEncoder().encode(raw).length > 350000) return reply({ error: "Nội dung quá dài. Vui lòng rút gọn yêu cầu." }, 413);
     let json: unknown;
     try { json = JSON.parse(raw); } catch { return reply({ error: "Nội dung yêu cầu không hợp lệ." }, 400); }
     const input = requestSchema.safeParse(json);

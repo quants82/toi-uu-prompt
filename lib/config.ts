@@ -1,3 +1,4 @@
+import type { FormTemplate } from "./template-types";
 export const tasks = [
   { id: "lesson", label: "Kế hoạch bài dạy", description: "Mục tiêu rõ ràng, hoạt động khả thi, đúng form.", example: "Tối ưu giúp tôi prompt soạn kế hoạch bài dạy về phân số, có hoạt động nhóm và đánh giá cuối tiết.", fields: [{ key: "sequence", label: "Tiến trình / hoạt động mong muốn", placeholder: "Khởi động, khám phá, luyện tập, vận dụng…" }] },
   { id: "worksheet", label: "Phiếu học tập", description: "Nhiệm vụ dễ hiểu, có sản phẩm và hướng dẫn.", example: "Tối ưu prompt tạo phiếu học tập nhóm về bảo vệ môi trường, có hướng dẫn và tiêu chí đánh giá.", fields: [{ key: "organization", label: "Hình thức thực hiện", options: ["Cá nhân", "Cặp đôi", "Nhóm", "Kết hợp"] }, { key: "count", label: "Số nhiệm vụ", placeholder: "Ví dụ: 4 nhiệm vụ" }] },
@@ -15,7 +16,7 @@ export const providers = {
 } as const;
 export const fieldLabels: Record<string, string> = {
   roleMode: "Cách chọn vai trò AI", role: "Vai trò AI tùy chỉnh", level: "Cấp học", grade: "Lớp / nhóm tuổi", subject: "Môn học", topic: "Bài / chủ đề",
-  duration: "Thời lượng", audience: "Đối tượng học sinh", objectives: "Mục tiêu",
+  duration: "Thời lượng", audience: "Đối tượng học sinh", objectives: "Mục tiêu thiết kế", learningRequirements: "Yêu cầu cần đạt — nguyên văn",
   curriculum: "Chương trình / bộ sách", equipment: "Điều kiện dạy học",
   methods: "Phương pháp", extra: "Yêu cầu khác", sequence: "Tiến trình",
   organization: "Hình thức thực hiện", count: "Số lượng / phân bố", levels: "Mức độ",
@@ -24,7 +25,7 @@ export const fieldLabels: Record<string, string> = {
 };
 export type Draft = {
   task: TaskId; originalPrompt: string; fields: Record<string, string>;
-  math: boolean; sourceNotes: string; templateNotes: string; fileNames: string[];
+  math: boolean; sourceNotes: string; templateNotes: string; fileNames: string[]; formTemplate?: FormTemplate;
 };
 export const emptyDraft: Draft = {
   task: "lesson", originalPrompt: "", fields: {}, math: false,

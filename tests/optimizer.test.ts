@@ -7,7 +7,7 @@ import { requestSchema, parseResult, buildInput, type OptimizerRequest } from ".
 import { optimizeWithProvider, ProviderError } from "../lib/providers";
 import { serializeHistory, deserializeHistory } from "../lib/storage";
 
-const draft = { ...emptyDraft, originalPrompt: "Tạo prompt kế hoạch bài dạy về phân số", fields: { subject: "Toán", grade: "Lớp 6" }, math: true, fileNames: ["SGK.pdf", "Mau.docx"] };
+const draft = { ...emptyDraft, originalPrompt: "Tạo prompt kế hoạch bài dạy về phân số", fields: { subject: "Toán", grade: "Lớp 6", learningRequirements: "Nhận biết và so sánh phân số." }, math: true, fileNames: ["SGK.pdf", "Mau.docx"] };
 const input: OptimizerRequest = { provider: "openai", model: "gpt-4.1-mini", draft, answers: [] };
 const ready = { status: "ready", summary: "Đã tối ưu", questions: [], optimizedPrompt: "Hãy tạo kế hoạch theo tài liệu.", improvements: ["Làm rõ mục tiêu"] };
 

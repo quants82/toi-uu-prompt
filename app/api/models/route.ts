@@ -1,3 +1,4 @@
+import { isSameOrigin } from "@/lib/request-origin";
 import { NextRequest, NextResponse } from "next/server";
 import { listProviderModels } from "@/lib/models";
 import { ProviderError } from "@/lib/providers";
@@ -6,8 +7,7 @@ export const runtime = "nodejs";
 export const maxDuration = 20;
 function reply(body: unknown, status = 200) { return NextResponse.json(body, { status, headers: { "Cache-Control": "no-store" } }); }
 export async function POST(request: NextRequest) {
-  const origin = request.headers.get("origin");
-  if (origin && origin !== request.nextUrl.origin) return reply({ error: "Yêu cầu không cùng nguồn với website." }, 403);
+  if (!isSameOrigin(request)) return reply({ error: "Yêu cầu không cùng nguồn với website." }, 403);
   const key = request.headers.get("x-provider-key")?.trim();
   if (!key || key.length < 10 || key.length > 512 || /[\r\n]/.test(key)) return reply({ error: "Vui lòng nhập khóa API hợp lệ để tải danh sách mô hình." }, 400);
   try {

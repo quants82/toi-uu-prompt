@@ -5,7 +5,8 @@ export function serializeHistory(entries: HistoryEntry[]): string {
   return JSON.stringify(entries.slice(0, 20).map(({ id, createdAt, draft, provider, model, result }) => ({
     id, createdAt, draft: {
       task: draft.task, originalPrompt: draft.originalPrompt, fields: draft.fields, math: draft.math,
-      sourceNotes: draft.sourceNotes, templateNotes: draft.templateNotes, fileNames: draft.fileNames
+      sourceNotes: draft.sourceNotes, templateNotes: draft.templateNotes, fileNames: draft.fileNames,
+      ...(draft.formTemplate ? { formTemplate: { id: draft.formTemplate.id, name: draft.formTemplate.name, url: draft.formTemplate.url, content: draft.formTemplate.content } } : {})
     }, provider, model, result
   })));
 }
