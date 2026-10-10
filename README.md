@@ -38,7 +38,7 @@ npm start
 2. Project Name: `toi-uu-prompt`.
 3. Application / Framework Preset: **Next.js**.
 4. Root Directory: `./`.
-5. Giữ mặc định Build Command `next build` / `npm run build`; Output Directory để mặc định Next.js.
+5. Repo có `vercel.json` đặt Next.js, Install Command `npm ci`, Build Command `npm run build` và Output Directory mặc định. Tắt các tùy chỉnh Output Directory nếu có trong giao diện.
 6. Environment Variables: không cần thêm khóa OpenAI/Gemini chung.
 7. Deploy. Khi có trạng thái Ready, mở địa chỉ Vercel cấp.
 8. Các commit vào nhánh production (`main`) kích hoạt triển khai lại.
